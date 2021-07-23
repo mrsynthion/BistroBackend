@@ -15,3 +15,5 @@ const IngredientsModel = db.define('Ingredients', {
     allowNull: false,
   },
 });
+
+module.exports(IngredientsModel);
