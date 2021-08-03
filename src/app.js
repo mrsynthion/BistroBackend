@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const db = require('./db/config/database');
 
+//Body parser
+app.use(express.urlencoded());
+app.use(express.json());
 // Db connection
 db.authenticate()
   .then(() => console.log('Authenticated'))
