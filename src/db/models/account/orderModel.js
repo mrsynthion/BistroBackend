@@ -3,11 +3,11 @@ const db = require('../../config/database');
 
 const OrdersModel = db.define('Orders', {
   orderUserId: {
-    type: Sequelize.NUMBER,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   orderMenuItemsId: {
-    type: Sequelize.NUMBER,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   orderTotalPrice: {

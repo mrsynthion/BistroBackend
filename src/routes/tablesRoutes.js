@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/config/database');
-const Tables = require('../db/models/tablesModel');
+const Tables = require('../db/models/restaurant/tablesModel');
 
 router.get('/', (req, res) =>
   Tables.findAll()

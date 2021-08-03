@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/config/database');
-const MenuItems = require('../db/models/MenuItemsModel');
+const MenuItems = require('../db/models/menu/menuItemsModel');
 
 router.get('/', (req, res) =>
   MenuItems.findAll()

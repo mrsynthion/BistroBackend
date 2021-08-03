@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const db = require('../../config/database');
 
-const CalendarModel = db.defive('Calendar', {
+const CalendarModel = db.define('Calendar', {
   calendarStartDate: {
     type: Sequelize.DATE,
     allowNull: false,
@@ -11,11 +11,11 @@ const CalendarModel = db.defive('Calendar', {
     allowNull: false,
   },
   calendarTableId: {
-    type: Sequelize.NUMBER,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   calendarUserId: {
-    type: Sequelize.NUMBER,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   calendarIsConfirmed: {
