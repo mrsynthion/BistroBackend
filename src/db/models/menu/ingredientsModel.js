@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const db = require('../config/database');
+const db = require('../../config/database');
 
 const IngredientsModel = db.define('Ingredients', {
   ingredientName: {
@@ -15,3 +15,5 @@ const IngredientsModel = db.define('Ingredients', {
     allowNull: false,
   },
 });
+
+module.exports = IngredientsModel;
