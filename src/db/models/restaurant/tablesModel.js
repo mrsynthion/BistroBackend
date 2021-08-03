@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const db = require('../config/database');
+const db = require('../../config/database');
 
 const TablesModel = db.define('Tables', {
   tableQuantityOfSeats: {
@@ -8,4 +8,4 @@ const TablesModel = db.define('Tables', {
   },
 });
 
-module.exports(TablesModel);
+module.exports = TablesModel;
