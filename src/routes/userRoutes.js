@@ -13,31 +13,44 @@ router.get('/', (req, res) =>
     })
     .catch((err) => console.log(err))
 );
+
 router.post('/addUser', (req, res) => {
-  bcrypt
-    .hash(req.body.userPassword, saltRounds)
-    .then((hash) => {
-      Users.create({
-        userName: req.body.userName,
-        userLastName: req.body.userLastName,
-        userCity: req.body.userCity,
-        userAdressStreetName: req.body.userAdressStreetName,
-        userAdressStreetNumber: req.body.userAdressStreetNumber,
-        userAdressHomeNumber: req.body.userAdressHomeNumber,
-        userPhoneNumber: req.body.userPhoneNumber,
-        userUsername: req.body.userUsername,
-        userPassword: hash,
-      })
-        .then((result) => {
-          res.statusCode = 201;
-          res.send(result);
-        })
-        .catch((err) => {
-          res.statusCode = 500;
-          res.send(err);
-        });
+  Users.findOne({ where: { userUsername: req.body.userUsername } })
+    .then((user) => {
+      if (user) {
+        res.statusCode = 400;
+        res.send('Username already taken');
+      } else {
+        bcrypt
+          .hash(req.body.userPassword, saltRounds)
+          .then((hash) => {
+            Users.create({
+              userName: req.body.userName,
+              userLastName: req.body.userLastName,
+              userCity: req.body.userCity,
+              userAdressStreetName: req.body.userAdressStreetName,
+              userAdressStreetNumber: req.body.userAdressStreetNumber,
+              userAdressHomeNumber: req.body.userAdressHomeNumber,
+              userPhoneNumber: req.body.userPhoneNumber,
+              userUsername: req.body.userUsername,
+              userPassword: hash,
+            })
+              .then((result) => {
+                res.statusCode = 201;
+                res.send(result);
+              })
+              .catch((err) => {
+                res.statusCode = 500;
+                res.send(err);
+              });
+          })
+          .catch((err) => console.log(err));
+      }
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      res.statusCode = 500;
+      res.send(err);
+    });
 });
 
 router.post('/updateUser', (req, res) => {
@@ -73,6 +86,26 @@ router.delete('/deleteUser', (req, res) => {
     })
     .catch((err) => {
       res.statusCode = 500;
+      res.send(err);
+    });
+});
+
+router.post('/login', (req, res) => {
+  Users.findOne({ where: { userUsername: req.body.userUsername } })
+    .then((data) => {
+      bcrypt
+        .compare(req.body.userPassword, data.userPassword)
+        .then((result) => {
+          res.statusCode = 200;
+          res.send(result);
+        })
+        .catch((err) => {
+          res.statusCode = 401;
+          res.send(err);
+        });
+    })
+    .catch((err) => {
+      res.statusCode = 401;
       res.send(err);
     });
 });
