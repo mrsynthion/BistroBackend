@@ -38,6 +38,10 @@ const UsersModel = db.define('Users', {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  userType: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
 });
 
 module.exports = UsersModel;
