@@ -8,15 +8,26 @@ const {
   createAccessToken,
   createRefreshToken,
 } = require('../jwtTokens/createToken');
+const { verifyAccess } = require('../jwtTokens/verifyToken');
 
-router.get('/', (req, res) =>
-  Users.findAll()
-    .then((users) => {
-      res.statusCode = 200;
-      res.json(users);
-    })
-    .catch((err) => console.log(err))
-);
+router.get('/', (req, res) => {
+  const accessToken = req.headers['access-token'];
+  const refreshToken = req.headers['refresh-token'];
+  console.log(accessToken, ' ', refreshToken);
+  const data = verifyAccess(accessToken, refreshToken, res);
+  console.log('data', data);
+  if (data && data.userType === 'ADMIN') {
+    Users.findAll()
+      .then((users) => {
+        res.statusCode = 200;
+        res.json(users);
+      })
+      .catch((err) => console.log(err));
+  } else {
+    res.statusCode = 401;
+    res.send('You are not an admin');
+  }
+});
 
 router.post('/addUser', (req, res) => {
   Users.findOne({ where: { userUsername: req.body.userUsername } })
@@ -125,15 +136,20 @@ router.post('/login', (req, res) => {
         .compare(req.body.userPassword, data.userPassword)
         .then((result) => {
           if (result === true) {
-            const accessToken = createAccessToken(req.body.userUsername);
-            const refreshToken = createRefreshToken(req.body.userUsername);
-
+            const accessToken = createAccessToken(
+              req.body.userUsername,
+              data.userType
+            );
+            const refreshToken = createRefreshToken(
+              req.body.userUsername,
+              data.userType
+            );
             res.statusCode = 200;
-            res.cookie('refresh-token', refreshToken, {
-              expires: new Date(Date.now() + 604800000),
-            });
             res.cookie('access-token', accessToken, {
               expires: new Date(Date.now() + 900000),
+            });
+            res.cookie('refresh-token', refreshToken, {
+              expires: new Date(Date.now() + 604800000),
             });
             res.send(result);
           } else {

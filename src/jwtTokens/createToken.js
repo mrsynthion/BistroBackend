@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const createAccessToken = (username) =>
-  jwt.sign({ userName: username }, process.env.PRIVATE_KEY, {
-    expiresIn: '15min',
+
+const createAccessToken = (userName, userType) =>
+  jwt.sign({ userName, userType }, process.env.PRIVATE_KEY_ACCESS, {
+    expiresIn: '1min',
   });
-const createRefreshToken = (username) =>
-  jwt.sign({ userName: username }, process.env.PRIVATE_KEY, {
+const createRefreshToken = (userName, userType) =>
+  jwt.sign({ userName, userType }, process.env.PRIVATE_KEY_REFRESH, {
     expiresIn: '7d',
   });
 module.exports = { createAccessToken, createRefreshToken };
