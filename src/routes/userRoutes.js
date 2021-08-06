@@ -11,11 +11,10 @@ const {
 const { verifyAccess } = require('../jwtTokens/verifyToken');
 
 router.get('/', (req, res) => {
-  const accessToken = req.headers['access-token'];
-  const refreshToken = req.headers['refresh-token'];
-  console.log(accessToken, ' ', refreshToken);
-  const data = verifyAccess(accessToken, refreshToken, res);
-  console.log('data', data);
+  const data = verifyAccess(req, res);
+  if (!data) {
+    return;
+  }
   if (data && data.userType === 'ADMIN') {
     Users.findAll()
       .then((users) => {
@@ -25,7 +24,7 @@ router.get('/', (req, res) => {
       .catch((err) => console.log(err));
   } else {
     res.statusCode = 401;
-    res.send('You are not an admin');
+    res.json({ message: 'You are not an admin' });
   }
 });
 
@@ -34,7 +33,7 @@ router.post('/addUser', (req, res) => {
     .then((user) => {
       if (user) {
         res.statusCode = 400;
-        res.send('Username already taken');
+        res.json({ message: 'Username already taken' });
       } else {
         bcrypt
           .hash(req.body.userPassword, saltRounds)
@@ -54,11 +53,11 @@ router.post('/addUser', (req, res) => {
               })
                 .then((result) => {
                   res.statusCode = 201;
-                  res.send(result);
+                  res.json(result);
                 })
                 .catch((err) => {
                   res.statusCode = 500;
-                  res.send(err);
+                  res.json({ err });
                 });
             } else {
               Users.create({
@@ -93,40 +92,68 @@ router.post('/addUser', (req, res) => {
 });
 
 router.post('/updateUser', (req, res) => {
-  Users.update(
-    {
-      userName: req.body.userName,
-      userLastName: req.body.userLastName,
-      userCity: req.body.userCity,
-      userAdressStreetName: req.body.userAdressStreetName,
-      userAdressStreetNumber: req.body.userAdressStreetNumber,
-      userAdressHomeNumber: req.body.userAdressHomeNumber,
-      userPhoneNumber: req.body.userPhoneNumber,
-      userUsername: req.body.userUsername,
-      userPassword: req.body.userPassword,
-    },
-    { where: { id: req.body.id } }
-  )
-    .then((result) => {
-      res.statusCode = 200;
-      res.send(result);
-    })
-    .catch((err) => {
-      res.statusCode = 500;
-      res.send(err);
-    });
+  const data = verifyAccess(req, res);
+  if (!data) {
+    res.statusCode = 401;
+    res.redirect('/');
+  }
+  if (data && data.userUsername === req.body.userUsername) {
+    Users.update(
+      {
+        userName: req.body.userName,
+        userLastName: req.body.userLastName,
+        userCity: req.body.userCity,
+        userAdressStreetName: req.body.userAdressStreetName,
+        userAdressStreetNumber: req.body.userAdressStreetNumber,
+        userAdressHomeNumber: req.body.userAdressHomeNumber,
+        userPhoneNumber: req.body.userPhoneNumber,
+        userPassword: req.body.userPassword,
+      },
+      { where: { id: req.body.id } }
+    )
+      .then((result) => {
+        res.statusCode = 200;
+        res.send(result);
+      })
+      .catch((err) => {
+        res.statusCode = 500;
+        res.send(err);
+      });
+  }
 });
 
 router.delete('/deleteUser', (req, res) => {
-  Users.destroy({ where: { id: req.body.id } })
-    .then((res) => {
-      res.statusCode(200);
-      res.send(res);
-    })
-    .catch((err) => {
-      res.statusCode = 500;
-      res.send(err);
-    });
+  const data = verifyAccess(req, res);
+  if (!data) {
+    res.statusCode = 401;
+    res.redirect('/');
+  }
+  if (data && data.userType === 'USER') {
+    Users.destroy({ where: { userUsername: data.userUsername } })
+      .then(() => {
+        res.sendStatus(200);
+      })
+      .catch(() => {
+        res.sendStatus(500);
+      });
+  } else {
+    if (
+      (data && data.userType === 'ADMIN') ||
+      (data && data.userType === 'PERSONEL')
+    ) {
+      Users.destroy({ where: { id: req.body.id } })
+        .then(() => {
+          res.sendStatus(200);
+        })
+        .catch((err) => {
+          res.statusCode = 500;
+          res.send(err);
+        });
+    } else {
+      res.statusCode = 401;
+      res.redirect('/');
+    }
+  }
 });
 
 router.post('/login', (req, res) => {

@@ -16,10 +16,12 @@ const verifyRefreshToken = (refreshToken) => {
 const invalidateTokens = (res) => {
   res.clearCookie('access-token');
   res.clearCookie('refresh-token');
-  return res.redirect('/');
+  res.redirect('/');
 };
 
-const verifyAccess = (accessToken, refreshToken, res) => {
+const verifyAccess = (req, res) => {
+  const accessToken = req.headers['access-token'];
+  const refreshToken = req.headers['refresh-token'];
   try {
     const vat = verifyAccessToken(accessToken);
     return vat;
