@@ -17,6 +17,7 @@ app.use('/calendar', require('./routes/calendarRoutes'));
 app.use('/ingredients', require('./routes/ingredientsRoutes'));
 app.use('/tables', require('./routes/tablesRoutes'));
 app.use('/menuItems', require('./routes/menuItemsRoutes'));
+app.use('/schedule', require('./routes/scheduleRoutes'));
 
 //Main route
 app.get('/', (req, res) => res.send('Backend działa'));
