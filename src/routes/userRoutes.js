@@ -8,7 +8,7 @@ const {
   createAccessToken,
   createRefreshToken,
 } = require('../jwtTokens/createToken');
-const { verifyAccess } = require('../jwtTokens/verifyToken');
+const { verifyAccess, invalidateTokens } = require('../jwtTokens/verifyToken');
 
 router.get('/', (req, res) => {
   const data = verifyAccess(req, res);
@@ -192,6 +192,10 @@ router.post('/login', (req, res) => {
       res.statusCode = 401;
       res.send(err);
     });
+});
+
+router.post('/logout', (req, res) => {
+  invalidateTokens(res);
 });
 
 module.exports = router;

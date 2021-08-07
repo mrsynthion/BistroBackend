@@ -18,7 +18,11 @@ const OrdersModel = db.define('Orders', {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  orderIsCompleted: {
+  orderIsSent: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+  },
+  orderIsAccepted: {
     type: Sequelize.BOOLEAN,
     allowNull: false,
   },
