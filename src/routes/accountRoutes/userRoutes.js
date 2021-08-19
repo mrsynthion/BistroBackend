@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
   if (!data) {
     return;
   }
-  if (data && data.userType === 'ADMIN') {
+  if (data && data.userType === userTypes.ADMIN) {
     Users.findAll()
       .then((users) => {
         res.statusCode = 200;
@@ -52,7 +52,7 @@ router.post('/addUser', (req, res) => {
                 userPhoneNumber: req.body.userPhoneNumber,
                 userUsername: req.body.userUsername,
                 userPassword: hash,
-                userType: 'user'.toUpperCase(),
+                userType: userTypes.USER,
               })
                 .then((result) => {
                   res.statusCode = 201;
@@ -131,7 +131,7 @@ router.delete('/deleteUser', (req, res) => {
     res.statusCode = 401;
     res.redirect('/');
   }
-  if (data && data.userType === 'USER') {
+  if (data && data.userType === userTypes.USER) {
     Users.destroy({ where: { userUsername: data.userUsername } })
       .then(() => {
         res.sendStatus(200);
@@ -141,8 +141,8 @@ router.delete('/deleteUser', (req, res) => {
       });
   } else {
     if (
-      (data && data.userType === 'ADMIN') ||
-      (data && data.userType === 'PERSONEL')
+      (data && data.userType === userTypes.ADMIN) ||
+      (data && data.userType === userTypes.PERSONEL)
     ) {
       Users.destroy({ where: { id: req.body.id } })
         .then(() => {

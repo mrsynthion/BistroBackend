@@ -3,13 +3,14 @@ const router = express.Router();
 const db = require('../../db/config/database');
 const Orders = require('../../db/models/account/orderModel');
 const { verifyAccess } = require('../../jwtTokens/verifyToken');
+const userTypes = require('../../../consts');
 
 router.post('/addOrder', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;
   }
-  if (data && data.userType === 'USER') {
+  if (data && data.userType === userTypes.USER) {
     Orders.create({
       orderUserUsername: req.body.userName,
       orderMenuItemsId: req.body.itemsId,
@@ -34,7 +35,7 @@ router.get('/history', (req, res) => {
   if (!data) {
     return;
   }
-  if (data && data.userType === 'USER') {
+  if (data && data.userType === userTypes.USER) {
     Orders.findAll({ where: { orderUserUsername: data.userUsername } })
       .then((orders) => {
         orders.reverse();
@@ -47,8 +48,8 @@ router.get('/history', (req, res) => {
       });
   }
   if (
-    (data && data.userType === 'PERSONEL') ||
-    (data && data.userType === 'ADMIN')
+    (data && data.userType === userTypes.PERSONEL) ||
+    (data && data.userType === userTypes.ADMIN)
   ) {
     Orders.findAll()
       .then((orders) => {
@@ -68,7 +69,7 @@ router.post('/update', (req, res) => {
   if (!data) {
     return;
   }
-  if (data && data.userType === 'ADMIN') {
+  if (data && data.userType === userTypes.ADMIN) {
     Orders.update({
       orderIsSent: req.body.isSent,
       orderIsAccepted: req.body.isAccepted,
