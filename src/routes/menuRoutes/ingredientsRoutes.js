@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/config/database');
-const Ingredients = require('../db/models/menu/ingredientsModel');
+const db = require('../../db/config/database');
+const Ingredients = require('../../db/models/menu/ingredientsModel');
 
 router.get('/', (req, res) =>
   Ingredients.findAll()

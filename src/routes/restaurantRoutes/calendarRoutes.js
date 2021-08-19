@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/config/database');
-const MenuItems = require('../db/models/menu/menuItemsModel');
+const db = require('../../db/config/database');
+const Calendar = require('../../db/models/restaurant/calendarModel');
 
 router.get('/', (req, res) =>
-  MenuItems.findAll()
-    .then((menuItems) => {
-      console.log(menuItems);
+  Calendar.findAll()
+    .then((calendar) => {
+      console.log(calendar);
       res.sendStatus(200);
     })
     .catch((err) => console.log(err))

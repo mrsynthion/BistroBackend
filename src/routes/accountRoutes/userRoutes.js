@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/config/database');
-const Users = require('../db/models/account/usersModel');
+const db = require('../../db/config/database');
+const Users = require('../../db/models/account/usersModel');
 const bcrypt = require('bcrypt');
 const saltRounds = 2;
 const {
   createAccessToken,
   createRefreshToken,
-} = require('../jwtTokens/createToken');
-const { verifyAccess, invalidateTokens } = require('../jwtTokens/verifyToken');
+} = require('../../jwtTokens/createToken');
+const {
+  verifyAccess,
+  invalidateTokens,
+} = require('../../jwtTokens/verifyToken');
 
 router.get('/', (req, res) => {
   const data = verifyAccess(req, res);

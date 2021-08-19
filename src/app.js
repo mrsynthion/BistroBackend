@@ -11,13 +11,13 @@ db.authenticate()
   .catch((err) => console.log(err));
 
 //Routes
-app.use('/users', require('./routes/userRoutes'));
-app.use('/orders', require('./routes/ordersRoutes'));
-app.use('/calendar', require('./routes/calendarRoutes'));
-app.use('/ingredients', require('./routes/ingredientsRoutes'));
-app.use('/tables', require('./routes/tablesRoutes'));
-app.use('/menuItems', require('./routes/menuItemsRoutes'));
-app.use('/schedule', require('./routes/scheduleRoutes'));
+app.use('/users', require('./routes/accountRoutes/userRoutes'));
+app.use('/orders', require('./routes/accountRoutes/ordersRoutes'));
+app.use('/ingredients', require('./routes/menuRoutes/ingredientsRoutes'));
+app.use('/menuItems', require('./routes/menuRoutes/menuItemsRoutes'));
+app.use('/tables', require('./routes/restaurantRoutes/tablesRoutes'));
+app.use('/calendar', require('./routes/restaurantRoutes/calendarRoutes'));
+app.use('/schedule', require('./routes/restaurantRoutes/scheduleRoutes'));
 
 //Main route
 app.get('/', (req, res) => res.send('Backend działa'));

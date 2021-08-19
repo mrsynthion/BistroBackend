@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/config/database');
-const Orders = require('../db/models/account/orderModel');
-const { verifyAccess } = require('../jwtTokens/verifyToken');
+const db = require('../../db/config/database');
+const Orders = require('../../db/models/account/orderModel');
+const { verifyAccess } = require('../../jwtTokens/verifyToken');
 
 router.post('/addOrder', (req, res) => {
   const data = verifyAccess(req, res);
