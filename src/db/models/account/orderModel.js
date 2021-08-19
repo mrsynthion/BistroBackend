@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const db = require('../../config/database');
 
 const OrdersModel = db.define('Orders', {
-  orderUserId: {
+  orderUserUsername: {
     type: Sequelize.STRING,
     allowNull: false,
   },
