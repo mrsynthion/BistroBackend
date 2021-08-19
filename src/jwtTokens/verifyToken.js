@@ -16,7 +16,8 @@ const verifyRefreshToken = (refreshToken) => {
 const invalidateTokens = (res) => {
   res.clearCookie('access-token');
   res.clearCookie('refresh-token');
-  res.redirect('/');
+  res.statusCode = 401;
+  res.json({ message: 'Access denied' });
 };
 
 const verifyAccess = (req, res) => {
