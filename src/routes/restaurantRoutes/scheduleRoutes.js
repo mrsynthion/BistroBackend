@@ -57,5 +57,32 @@ router.post('/addSchedule', (req, res) => {
       });
   }
 });
+router.post('/updateSchedule', (req, res) => {
+  const data = verifyAccess(req, res);
+  if (!data) {
+    return;
+  }
+  if (
+    data &&
+    (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
+  ) {
+    Schedule.update({
+      scheduleWeekDay: req.body.scheduleWeekDay,
+      scheduleOpeningHour: req.body.scheduleOpeningHour,
+      scheduleCloseHour: req.body.scheduleCloseHour,
+    })
+      .then((scheduleDay) => {
+        res.statusCode = 201;
+        res.json(scheduleDay);
+      })
+      .catch((err) => {
+        res.statusCode = 500;
+        res.json({
+          message: 'There is problem with updating schedule day in database',
+          err,
+        });
+      });
+  }
+});
 
 module.exports = router;
