@@ -26,24 +26,19 @@ router.post('/addTable', (req, res) => {
     data &&
     (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
   ) {
-    Tables.findAll()
-      .then((tables) => {
-        if (tables.length < 8) {
-          Tables.create({
-            tableQuantityOfSeats: req.body.tableQuantityOfSeats,
-          })
-            .then((table) => {
-              res.statusCode = 201;
-              res.json(table);
-            })
-            .catch((err) => {
-              res.statusCode = 500;
-              res.json({
-                message: 'There is problem with adding table day to database',
-                err,
-              });
-            });
-        }
+    Tables.create({
+      tableQuantityOfSeats: req.body.tableQuantityOfSeats,
+    })
+      .then((table) => {
+        res.statusCode = 201;
+        res.json(table);
+      })
+      .catch((err) => {
+        res.statusCode = 500;
+        res.json({
+          message: 'There is problem with adding table day to database',
+          err,
+        });
       })
       .catch((err) => {
         res.statusCode = 500;
