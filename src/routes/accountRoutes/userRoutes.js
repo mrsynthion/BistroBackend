@@ -24,10 +24,10 @@ router.get('/', (req, res) => {
         res.statusCode = 200;
         res.json(users);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => res.json({ ...err, message: 'Błąd serwera' }));
   } else {
     res.statusCode = 401;
-    res.json({ message: 'You are not an admin' });
+    res.json({ message: 'Nie jesteś adminem' });
   }
 });
 
@@ -36,7 +36,7 @@ router.post('/addUser', (req, res) => {
     .then((user) => {
       if (user) {
         res.statusCode = 400;
-        res.json({ message: 'Username already taken' });
+        res.json({ message: 'Nazwa uzytkownika jest zajęta' });
       } else {
         bcrypt
           .hash(req.body.userPassword, saltRounds)
@@ -60,7 +60,7 @@ router.post('/addUser', (req, res) => {
                 })
                 .catch((err) => {
                   res.statusCode = 500;
-                  res.json({ err });
+                  res.json({ ...err, message: 'Błąd serwera' });
                 });
             } else {
               Users.create({
@@ -81,11 +81,11 @@ router.post('/addUser', (req, res) => {
                 })
                 .catch((err) => {
                   res.statusCode = 500;
-                  res.send(err);
+                  res.send({ ...err, message: 'Błąd serwera' });
                 });
             }
           })
-          .catch((err) => console.log(err));
+          .catch((err) => res.json({ ...err, message: 'Błąd serwera' }));
       }
     })
     .catch((err) => {
@@ -116,11 +116,11 @@ router.post('/updateUser', (req, res) => {
     )
       .then((result) => {
         res.statusCode = 200;
-        res.send(result);
+        res.json(result);
       })
       .catch((err) => {
         res.statusCode = 500;
-        res.send(err);
+        res.json({ ...err, message: 'Błąd serwera' });
       });
   }
 });
