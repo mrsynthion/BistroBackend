@@ -12,19 +12,19 @@ const UsersModel = db.define('Users', {
   },
   userCity: {
     type: Sequelize.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   userAdressStreetName: {
     type: Sequelize.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   userAdressStreetNumber: {
     type: Sequelize.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   userAdressHomeNumber: {
     type: Sequelize.STRING,
-    allowNull: true,
+    allowNull: false,
   },
   userPhoneNumber: {
     type: Sequelize.STRING,

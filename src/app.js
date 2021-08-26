@@ -1,10 +1,12 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const db = require('./db/config/database');
 
 //Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 // Db connection
 db.authenticate()
   .then(() => console.log('Authenticated'))
