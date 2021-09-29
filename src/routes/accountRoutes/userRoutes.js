@@ -4,6 +4,7 @@ const db = require('../../db/config/database');
 const Users = require('../../db/models/account/usersModel');
 const bcrypt = require('bcrypt');
 const saltRounds = 2;
+const userTypes = require('../../../consts');
 const {
   createAccessToken,
   createRefreshToken,
@@ -41,7 +42,10 @@ router.post('/addUser', (req, res) => {
         bcrypt
           .hash(req.body.userPassword, saltRounds)
           .then((hash) => {
+            console.log(hash);
             if (!req.body.userType) {
+              console.log('siema1');
+              console.log(req.body);
               Users.create({
                 userName: req.body.userName,
                 userLastName: req.body.userLastName,
@@ -55,12 +59,14 @@ router.post('/addUser', (req, res) => {
                 userType: userTypes.USER,
               })
                 .then((result) => {
+                  console.log('siema2');
                   res.statusCode = 201;
                   res.json(result);
                 })
                 .catch((err) => {
+                  console.log('siema3');
                   res.statusCode = 500;
-                  res.json({ ...err, message: 'Błąd serwera' });
+                  res.json({ ...err, message: 'Błąd serwera1' });
                 });
             } else {
               Users.create({
@@ -77,20 +83,23 @@ router.post('/addUser', (req, res) => {
               })
                 .then((result) => {
                   res.statusCode = 201;
-                  res.send(result);
+                  res.json(result);
                 })
                 .catch((err) => {
                   res.statusCode = 500;
-                  res.send({ ...err, message: 'Błąd serwera' });
+                  res.json({ ...err, message: 'Błąd serwera2' });
                 });
             }
           })
-          .catch((err) => res.json({ ...err, message: 'Błąd serwera' }));
+          .catch((err) => {
+            res.statusCode = 500;
+            res.json({ ...err, message: 'Błąd serwera3' });
+          });
       }
     })
     .catch((err) => {
       res.statusCode = 500;
-      res.send(err);
+      res.json({ ...err, message: 'Błąd serwera' });
     });
 });
 
@@ -148,9 +157,10 @@ router.delete('/deleteUser', (req, res) => {
         .then(() => {
           res.sendStatus(200);
         })
+
         .catch((err) => {
           res.statusCode = 500;
-          res.send(err);
+          res.json(err);
         });
     } else {
       res.statusCode = 401;
@@ -160,8 +170,10 @@ router.delete('/deleteUser', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
+  console.log(req.body);
   Users.findOne({ where: { userUsername: req.body.userUsername } })
     .then((data) => {
+      console.log(data);
       bcrypt
         .compare(req.body.userPassword, data.userPassword)
         .then((result) => {
@@ -177,28 +189,37 @@ router.post('/login', (req, res) => {
             res.statusCode = 200;
             res.cookie('access-token', accessToken, {
               expires: new Date(Date.now() + 900000),
+              secure: true,
+              httpOnly: true,
             });
             res.cookie('refresh-token', refreshToken, {
               expires: new Date(Date.now() + 604800000),
+              secure: true,
+              httpOnly: true,
             });
-            res.send(result);
+
+            const { userUsername, userName } = data.dataValues;
+            res.json({ userUsername, userName });
           } else {
-            res.sendStatus(401);
+            res.statusCode = 401;
+            res.json({ message: 'Nieprawidłowe dane logowania' });
           }
         })
-        .catch((err) => {
+        .catch(() => {
           res.statusCode = 401;
-          res.send(err);
+          res.json({ message: 'Nieprawidłowe dane logowania' });
         });
     })
-    .catch((err) => {
+    .catch(() => {
       res.statusCode = 401;
-      res.send(err);
+      res.json({ message: 'Nieprawidłowe dane logowania' });
     });
 });
 
 router.post('/logout', (req, res) => {
   invalidateTokens(res);
+  res.statusCode = 200;
+  res.json({ message: 'Wylogowywanie pomyślne' });
 });
 
 module.exports = router;

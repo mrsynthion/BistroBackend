@@ -6,7 +6,8 @@ const db = require('./db/config/database');
 //Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+
 // Db connection
 db.authenticate()
   .then(() => console.log('Authenticated'))
