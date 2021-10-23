@@ -6,35 +6,26 @@ const { verifyAccess } = require('../../jwtTokens/verifyToken');
 const userTypes = require('../../../consts');
 
 router.get('/', (req, res) => {
-  const data = verifyAccess(req, res);
-  if (!data) {
-    return;
-  }
-  if (
-    data &&
-    (data.userType === userTypes.USER ||
-      data.userType === userTypes.ADMIN ||
-      data.userType === userTypes.PERSONEL)
-  ) {
-    MenuItems.findAll()
-      .then((menuItems) => {
-        res.statusCode = 200;
-        res.json(menuItems);
-      })
-      .catch((err) => {
-        res.statusCode = 500;
-        res.json(err);
-      });
-  }
+  MenuItems.findAll()
+    .then((menuItems) => {
+      res.statusCode = 200;
+      res.json(menuItems);
+    })
+    .catch((err) => {
+      res.statusCode = 500;
+      res.json(err);
+    });
 });
-router.post('/addMenuItem', (req, res) => {
+router.post('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;
   }
   if (
     data &&
-    (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
+    (data.userType === userTypes.ADMIN ||
+      data.userType === userTypes.PERSONEL ||
+      data.userType === userTypes.USER)
   ) {
     MenuItems.create({
       menuItemName: req.body.menuItemName,
@@ -53,14 +44,16 @@ router.post('/addMenuItem', (req, res) => {
   }
 });
 
-router.post('/updateMenuItem', (req, res) => {
+router.put('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;
   }
   if (
     data &&
-    (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
+    (data.userType === userTypes.ADMIN ||
+      data.userType === userTypes.PERSONEL ||
+      data.userType === userTypes.USER)
   ) {
     MenuItems.update(
       {
@@ -71,18 +64,18 @@ router.post('/updateMenuItem', (req, res) => {
       },
       { where: { id: req.body.id } }
     )
-      .then((menuItem) => {
+      .then(() => {
         res.statusCode = 200;
-        res.json(menuItem);
+        res.send('Edycja zakończona poprawnie');
       })
-      .catch((err) => {
+      .catch(() => {
         res.statusCode = 500;
-        res.json(err);
+        res.send('Edycja nie udała się');
       });
   }
 });
 
-router.delete('/deleteMenuItem', (req, res) => {
+router.delete('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;

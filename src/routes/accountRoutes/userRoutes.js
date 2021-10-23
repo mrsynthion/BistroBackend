@@ -11,6 +11,7 @@ const {
 } = require('../../jwtTokens/createToken');
 const {
   verifyAccess,
+  checkCookies,
   invalidateTokens,
 } = require('../../jwtTokens/verifyToken');
 
@@ -32,6 +33,27 @@ router.get('/', (req, res) => {
   }
 });
 
+router.get('/data', (req, res) => {
+  const data = verifyAccess(req, res);
+  if (data) {
+    Users.findOne({ where: { id: data?.id } })
+      .then((user) => {
+        console.log(user);
+        res.statusCode = 200;
+        delete user.dataValues['userPassword'];
+        res.json(user.dataValues);
+      })
+      .catch((err) => {
+        res.statusCode = 500;
+        res.json({ ...err, message: 'Błąd serwera1' });
+      });
+  } else {
+    console.log('blad');
+    res.statusCode = 401;
+    res.send('Error');
+  }
+});
+
 router.post('/addUser', (req, res) => {
   Users.findOne({ where: { userUsername: req.body.userUsername } })
     .then((user) => {
@@ -42,10 +64,7 @@ router.post('/addUser', (req, res) => {
         bcrypt
           .hash(req.body.userPassword, saltRounds)
           .then((hash) => {
-            console.log(hash);
             if (!req.body.userType) {
-              console.log('siema1');
-              console.log(req.body);
               Users.create({
                 userName: req.body.userName,
                 userLastName: req.body.userLastName,
@@ -59,12 +78,12 @@ router.post('/addUser', (req, res) => {
                 userType: userTypes.USER,
               })
                 .then((result) => {
-                  console.log('siema2');
                   res.statusCode = 201;
-                  res.json(result);
+                  delete result.dataValues['userPassword'];
+
+                  res.send(result.dataValues);
                 })
                 .catch((err) => {
-                  console.log('siema3');
                   res.statusCode = 500;
                   res.json({ ...err, message: 'Błąd serwera1' });
                 });
@@ -83,7 +102,9 @@ router.post('/addUser', (req, res) => {
               })
                 .then((result) => {
                   res.statusCode = 201;
-                  res.json(result);
+                  delete result.dataValues['userPassword'];
+
+                  res.send(result.dataValues);
                 })
                 .catch((err) => {
                   res.statusCode = 500;
@@ -109,7 +130,7 @@ router.post('/updateUser', (req, res) => {
     res.statusCode = 401;
     res.redirect('/');
   }
-  if (data && data.userUsername === req.body.userUsername) {
+  if (data && data.id === req.body.id) {
     Users.update(
       {
         userName: req.body.userName,
@@ -125,7 +146,9 @@ router.post('/updateUser', (req, res) => {
     )
       .then((result) => {
         res.statusCode = 200;
-        res.json(result);
+        delete result.dataValues['userPassword'];
+
+        res.send(result.dataValues);
       })
       .catch((err) => {
         res.statusCode = 500;
@@ -141,7 +164,7 @@ router.delete('/deleteUser', (req, res) => {
     res.redirect('/');
   }
   if (data && data.userType === userTypes.USER) {
-    Users.destroy({ where: { userUsername: data.userUsername } })
+    Users.destroy({ where: { id: data.id } })
       .then(() => {
         res.sendStatus(200);
       })
@@ -170,56 +193,51 @@ router.delete('/deleteUser', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  console.log(req.body);
   Users.findOne({ where: { userUsername: req.body.userUsername } })
     .then((data) => {
-      console.log(data);
       bcrypt
         .compare(req.body.userPassword, data.userPassword)
         .then((result) => {
           if (result === true) {
-            const accessToken = createAccessToken(
-              req.body.userUsername,
-              data.userType
-            );
-            const refreshToken = createRefreshToken(
-              req.body.userUsername,
-              data.userType
-            );
+            const accessToken = createAccessToken(data.id, data.userType);
+            const refreshToken = createRefreshToken(data.id, data.userType);
             res.statusCode = 200;
             res.cookie('access-token', accessToken, {
               expires: new Date(Date.now() + 900000),
-              secure: true,
               httpOnly: true,
+              secure: true,
             });
             res.cookie('refresh-token', refreshToken, {
               expires: new Date(Date.now() + 604800000),
-              secure: true,
               httpOnly: true,
+              secure: true,
             });
+            delete data.dataValues['userPassword'];
 
-            const { userUsername, userName } = data.dataValues;
-            res.json({ userUsername, userName });
+            res.send(data.dataValues);
           } else {
             res.statusCode = 401;
-            res.json({ message: 'Nieprawidłowe dane logowania' });
+            res.json({ message: 'Nieprawidłowe dane logowania1' });
           }
         })
         .catch(() => {
           res.statusCode = 401;
-          res.json({ message: 'Nieprawidłowe dane logowania' });
+          res.json({ message: 'Nieprawidłowe dane logowania2' });
         });
     })
     .catch(() => {
       res.statusCode = 401;
-      res.json({ message: 'Nieprawidłowe dane logowania' });
+      res.json({ message: 'Nieprawidłowe dane logowania3' });
     });
 });
 
 router.post('/logout', (req, res) => {
-  invalidateTokens(res);
+  if (req.cookies['access-token'] || req.cookies['refresh-token']) {
+    invalidateTokens(res);
+  }
+
   res.statusCode = 200;
-  res.json({ message: 'Wylogowywanie pomyślne' });
+  res.send('Udane wylogowywanie');
 });
 
 module.exports = router;

@@ -13,28 +13,51 @@ const verifyRefreshToken = (refreshToken) => {
   return jwt.verify(refreshToken, process.env.PRIVATE_KEY_REFRESH);
 };
 
+const checkCookies = (req, res) => {
+  const cookies = req.cookies;
+  console.log('cookies', cookies);
+  if (cookies) {
+    invalidateTokens(res);
+    res.statusCode = 401;
+    res.redirect('/');
+  } else {
+    res.statusCode = 401;
+    res.send('Brak cookies');
+  }
+};
+
 const invalidateTokens = (res) => {
   res.clearCookie('access-token');
   res.clearCookie('refresh-token');
 };
 
 const verifyAccess = (req, res) => {
-  const accessToken = req.headers['access-token'];
-  const refreshToken = req.headers['refresh-token'];
   try {
-    const vat = verifyAccessToken(accessToken);
-    return vat;
-  } catch {
+    const accessToken = req.cookies['access-token'];
+    const refreshToken = req.cookies['refresh-token'];
     try {
-      const vrt = verifyRefreshToken(refreshToken);
-      const newAccessToken = createAccessToken(vrt.userName, vrt.userType);
-      const newRefreshToken = createRefreshToken(vrt.userName, vrt.userType);
-      res.cookie('access-token', newAccessToken);
-      res.cookie('refresh-token', newRefreshToken);
-      return vrt;
+      const vat = verifyAccessToken(accessToken);
+      console.log(vat);
+      return vat;
     } catch {
-      invalidateTokens(res);
+      try {
+        const vrt = verifyRefreshToken(refreshToken);
+        console.log(vrt);
+        if (vrt && vrt.id) {
+          const newAccessToken = createAccessToken(vrt.id, vrt.userType);
+          const newRefreshToken = createRefreshToken(vrt.id, vrt.userType);
+          res.cookie('access-token', newAccessToken);
+          res.cookie('refresh-token', newRefreshToken);
+          return vrt;
+        }
+      } catch {
+        invalidateTokens(res);
+        return null;
+      }
     }
+  } catch (e) {
+    invalidateTokens(res);
+    return null;
   }
 };
 
@@ -43,4 +66,5 @@ module.exports = {
   verifyRefreshToken,
   invalidateTokens,
   verifyAccess,
+  checkCookies,
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../db/config/database');
-const Ingredients = require('../../db/models/menu/ingredientsModel');
+const MenuItemType = require('../../db/models/menu/menuItemTypeModel');
 const { verifyAccess } = require('../../jwtTokens/verifyToken');
 const userTypes = require('../../../consts');
 
@@ -16,10 +16,10 @@ router.get('/', (req, res) => {
       data.userType === userTypes.ADMIN ||
       data.userType === userTypes.PERSONEL)
   ) {
-    Ingredients.findAll()
-      .then((ingredients) => {
+    MenuItemType.findAll()
+      .then((menuItemType) => {
         res.statusCode = 200;
-        res.json(ingredients);
+        res.json(menuItemType);
       })
       .catch((err) => {
         res.statusCode = 500;
@@ -28,7 +28,7 @@ router.get('/', (req, res) => {
   }
 });
 
-router.post('/addIngredient', (req, res) => {
+router.post('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;
@@ -37,14 +37,12 @@ router.post('/addIngredient', (req, res) => {
     data &&
     (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
   ) {
-    Ingredients.create({
-      ingredientName: req.body.ingredientName,
-      ingredientPrice: req.body.ingredientPrice,
-      ingredientType: req.body.ingredientType,
+    MenuItemType.create({
+      name: req.body.name,
     })
-      .then((ingredient) => {
+      .then((menuItemType) => {
         res.statusCode = 201;
-        res.json(ingredient);
+        res.json(menuItemType);
       })
       .catch((err) => {
         res.statusCode = 500;
@@ -53,7 +51,7 @@ router.post('/addIngredient', (req, res) => {
   }
 });
 
-router.post('/updateIngredient', (req, res) => {
+router.put('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;
@@ -62,17 +60,15 @@ router.post('/updateIngredient', (req, res) => {
     data &&
     (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
   ) {
-    Ingredients.update(
+    MenuItemType.update(
       {
-        ingredientName: req.body.ingredientName,
-        ingredientPrice: req.body.ingredientPrice,
-        ingredientType: req.body.ingredientType,
+        name: req.body.name,
       },
       { where: { id: req.body.id } }
     )
-      .then((ingredient) => {
+      .then((menuItemType) => {
         res.statusCode = 200;
-        res.json(ingredient);
+        res.json(menuItemType);
       })
       .catch((err) => {
         res.statusCode = 500;
@@ -81,7 +77,7 @@ router.post('/updateIngredient', (req, res) => {
   }
 });
 
-router.delete('/deleteIngredient', (req, res) => {
+router.delete('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;
@@ -90,7 +86,7 @@ router.delete('/deleteIngredient', (req, res) => {
     data &&
     (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
   ) {
-    Ingredients.destroy({ where: { id: req.body.id } })
+    MenuItemType.destroy({ where: { id: req.body.id } })
       .then(() => {
         res.sendStatus(200);
       })
