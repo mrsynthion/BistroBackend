@@ -18,7 +18,7 @@ db.authenticate()
 //Routes
 app.use('/users', require('./routes/accountRoutes/userRoutes'));
 app.use('/orders', require('./routes/accountRoutes/ordersRoutes'));
-app.use('/ingredients', require('./routes/menuRoutes/menuItemTypesRoutes'));
+app.use('/menuItemsTypes', require('./routes/menuRoutes/menuItemsTypesRoutes'));
 app.use('/menuItems', require('./routes/menuRoutes/menuItemsRoutes'));
 app.use('/tables', require('./routes/restaurantRoutes/tablesRoutes'));
 app.use('/calendar', require('./routes/restaurantRoutes/calendarRoutes'));

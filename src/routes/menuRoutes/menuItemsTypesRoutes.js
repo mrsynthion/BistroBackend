@@ -1,31 +1,31 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../db/config/database');
-const MenuItemType = require('../../db/models/menu/menuItemTypeModel');
+const MenuItemsTypes = require('../../db/models/menu/MenuItemsTypesModel');
 const { verifyAccess } = require('../../jwtTokens/verifyToken');
 const userTypes = require('../../../consts');
 
 router.get('/', (req, res) => {
   const data = verifyAccess(req, res);
-  if (!data) {
-    return;
-  }
-  if (
-    data &&
-    (data.userType === userTypes.USER ||
-      data.userType === userTypes.ADMIN ||
-      data.userType === userTypes.PERSONEL)
-  ) {
-    MenuItemType.findAll()
-      .then((menuItemType) => {
-        res.statusCode = 200;
-        res.json(menuItemType);
-      })
-      .catch((err) => {
-        res.statusCode = 500;
-        res.json(err);
-      });
-  }
+  // if (!data) {
+  //   return;
+  // }
+  // if (
+  //   data &&
+  //   (data.userType === userTypes.USER ||
+  //     data.userType === userTypes.ADMIN ||
+  //     data.userType === userTypes.PERSONEL)
+  // ) {
+  MenuItemsTypes.findAll()
+    .then((menuItemsTypes) => {
+      res.statusCode = 200;
+      res.json(menuItemsTypes);
+    })
+    .catch((err) => {
+      res.statusCode = 500;
+      res.json(err);
+    });
+  // }
 });
 
 router.post('/', (req, res) => {
@@ -37,12 +37,12 @@ router.post('/', (req, res) => {
     data &&
     (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
   ) {
-    MenuItemType.create({
+    MenuItemsTypes.create({
       name: req.body.name,
     })
-      .then((menuItemType) => {
+      .then((menuItemsTypes) => {
         res.statusCode = 201;
-        res.json(menuItemType);
+        res.json(menuItemsTypes);
       })
       .catch((err) => {
         res.statusCode = 500;
@@ -60,15 +60,15 @@ router.put('/', (req, res) => {
     data &&
     (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
   ) {
-    MenuItemType.update(
+    MenuItemTypes.update(
       {
         name: req.body.name,
       },
       { where: { id: req.body.id } }
     )
-      .then((menuItemType) => {
+      .then((menuItemsTypes) => {
         res.statusCode = 200;
-        res.json(menuItemType);
+        res.json(menuItemsTypes);
       })
       .catch((err) => {
         res.statusCode = 500;
@@ -86,7 +86,7 @@ router.delete('/', (req, res) => {
     data &&
     (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
   ) {
-    MenuItemType.destroy({ where: { id: req.body.id } })
+    MenuItemsTypes.destroy({ where: { id: req.body.id } })
       .then(() => {
         res.sendStatus(200);
       })

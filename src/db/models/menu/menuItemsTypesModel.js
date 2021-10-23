@@ -1,11 +1,11 @@
 const Sequelize = require('sequelize');
 const db = require('../../config/database');
 
-const MenuItemType = db.define('MenuItemType', {
+const MenuItemsTypes = db.define('MenuItemsTypes', {
   name: {
     type: Sequelize.STRING,
     allowNull: false,
   },
 });
 
-module.exports = MenuItemType;
+module.exports = MenuItemsTypes;
