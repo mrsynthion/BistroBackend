@@ -15,7 +15,7 @@ const MenuItemsModel = db.define('MenuItems', {
     allowNull: true,
   },
   menuItemPrice: {
-    type: Sequelize.STRING,
+    type: Sequelize.NUMBER,
     allowNull: false,
   },
 });

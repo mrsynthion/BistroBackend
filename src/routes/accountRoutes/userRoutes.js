@@ -35,10 +35,10 @@ router.get('/', (req, res) => {
 
 router.get('/data', (req, res) => {
   const data = verifyAccess(req, res);
+
   if (data) {
     Users.findOne({ where: { id: data?.id } })
       .then((user) => {
-        console.log(user);
         res.statusCode = 200;
         delete user.dataValues['userPassword'];
         res.json(user.dataValues);
@@ -48,9 +48,7 @@ router.get('/data', (req, res) => {
         res.json({ ...err, message: 'Błąd serwera1' });
       });
   } else {
-    console.log('blad');
-    res.statusCode = 401;
-    res.send('Error');
+    checkCookies(req, res);
   }
 });
 
@@ -227,7 +225,7 @@ router.post('/login', (req, res) => {
     })
     .catch(() => {
       res.statusCode = 401;
-      res.json({ message: 'Nieprawidłowe dane logowania3' });
+      res.send('Nieprawidłowe dane logowania');
     });
 });
 

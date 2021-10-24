@@ -19,7 +19,7 @@ const checkCookies = (req, res) => {
   if (cookies) {
     invalidateTokens(res);
     res.statusCode = 401;
-    res.redirect('/');
+    res.send('');
   } else {
     res.statusCode = 401;
     res.send('Brak cookies');

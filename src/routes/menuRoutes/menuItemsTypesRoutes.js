@@ -6,16 +6,6 @@ const { verifyAccess } = require('../../jwtTokens/verifyToken');
 const userTypes = require('../../../consts');
 
 router.get('/', (req, res) => {
-  const data = verifyAccess(req, res);
-  // if (!data) {
-  //   return;
-  // }
-  // if (
-  //   data &&
-  //   (data.userType === userTypes.USER ||
-  //     data.userType === userTypes.ADMIN ||
-  //     data.userType === userTypes.PERSONEL)
-  // ) {
   MenuItemsTypes.findAll()
     .then((menuItemsTypes) => {
       res.statusCode = 200;
@@ -25,7 +15,6 @@ router.get('/', (req, res) => {
       res.statusCode = 500;
       res.json(err);
     });
-  // }
 });
 
 router.post('/', (req, res) => {
