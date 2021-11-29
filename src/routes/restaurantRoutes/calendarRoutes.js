@@ -8,9 +8,7 @@ const { Op } = require('sequelize');
 
 router.get('/', (req, res) => {
   const data = verifyAccess(req, res);
-  if (!data) {
-    return;
-  }
+
   if (
     data &&
     (data.userType === userTypes.USER ||
@@ -26,6 +24,21 @@ router.get('/', (req, res) => {
         res.statusCode = 500;
         res.json({ ...err, message: 'Błąd serwera' });
       });
+  } else {
+    const getCalendars = async () => {
+      try {
+        const calendars = await Calendar.findAll();
+        const newCalendars = calendars.map((calendar) => {
+          delete calendar.dataValues['calendarUserId'];
+          return calendar.dataValues;
+        });
+        res.statusCode = 200;
+        res.send(newCalendars);
+      } catch (e) {
+        res.sendStatus(500);
+      }
+    };
+    getCalendars();
   }
 });
 router.post('/addCalendar', (req, res) => {

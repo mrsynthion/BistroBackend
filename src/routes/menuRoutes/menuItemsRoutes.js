@@ -23,9 +23,7 @@ router.post('/', (req, res) => {
   }
   if (
     data &&
-    (data.userType === userTypes.ADMIN ||
-      data.userType === userTypes.PERSONEL ||
-      data.userType === userTypes.USER)
+    (data.userType === userTypes.ADMIN || data.userType === userTypes.PERSONEL)
   ) {
     MenuItems.create({
       menuItemName: req.body.menuItemName,

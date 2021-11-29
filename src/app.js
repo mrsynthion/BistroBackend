@@ -14,6 +14,9 @@ app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 db.authenticate()
   .then(() => console.log('Authenticated'))
   .catch((err) => console.log(err));
+// db.sync({ force: true })
+//   .then(() => console.log('Authenticated'))
+//   .catch((err) => console.log(err));
 
 //Routes
 app.use('/users', require('./routes/accountRoutes/userRoutes'));

@@ -37,15 +37,23 @@ const verifyAccess = (req, res) => {
     const refreshToken = req.cookies['refresh-token'];
     try {
       const vat = verifyAccessToken(accessToken);
-      console.log(vat);
+
       return vat;
     } catch {
       try {
         const vrt = verifyRefreshToken(refreshToken);
-        console.log(vrt);
+
         if (vrt && vrt.id) {
-          const newAccessToken = createAccessToken(vrt.id, vrt.userType);
-          const newRefreshToken = createRefreshToken(vrt.id, vrt.userType);
+          const newAccessToken = createAccessToken(
+            vrt.id,
+            vrt.userName,
+            vrt.userType
+          );
+          const newRefreshToken = createRefreshToken(
+            vrt.id,
+            vrt.userName,
+            vrt.userType
+          );
           res.cookie('access-token', newAccessToken);
           res.cookie('refresh-token', newRefreshToken);
           return vrt;

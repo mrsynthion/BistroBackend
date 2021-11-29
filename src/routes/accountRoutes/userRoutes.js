@@ -197,19 +197,28 @@ router.post('/login', (req, res) => {
         .compare(req.body.userPassword, data.userPassword)
         .then((result) => {
           if (result === true) {
-            const accessToken = createAccessToken(data.id, data.userType);
-            const refreshToken = createRefreshToken(data.id, data.userType);
+            const accessToken = createAccessToken(
+              data.id,
+              data.userName,
+              data.userType
+            );
+
+            const refreshToken = createRefreshToken(
+              data.id,
+              data.userName,
+              data.userType
+            );
+
             res.statusCode = 200;
             res.cookie('access-token', accessToken, {
               expires: new Date(Date.now() + 900000),
               httpOnly: true,
-              secure: true,
             });
             res.cookie('refresh-token', refreshToken, {
               expires: new Date(Date.now() + 604800000),
               httpOnly: true,
-              secure: true,
             });
+
             delete data.dataValues['userPassword'];
 
             res.send(data.dataValues);
