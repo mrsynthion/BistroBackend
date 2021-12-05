@@ -67,38 +67,6 @@ router.post('/addOrder', (req, res) => {
 router.get('/history', (req, res) => {
   const data = verifyAccess(req, res);
   if (data) {
-    async function historyOrders() {
-      const orders = await Orders.findAll({
-        where: { orderUserId: data.id },
-      });
-      orders.reverse();
-      console.log(orders.length);
-      let newOrders = [];
-
-      for (let x = 0; x < orders.length; x++) {
-        console.log(orders[x].dataValues);
-        let menuItemsData = [];
-        let orderMenuItemsId = orders[x].dataValues.orderMenuItemsId.split(',');
-        orderMenuItemsId = orderMenuItemsId.map((item) => parseInt(item));
-        for (let i = 0; i < orderMenuItemsId.length; i++) {
-          const data = await MenuItems.findOne({
-            where: { id: orderMenuItemsId[i] },
-          });
-
-          menuItemsData.push(data.dataValues);
-        }
-        let newOrder = orders[x].dataValues;
-
-        delete newOrder['orderMenuItemsId'];
-
-        newOrders.push({ ...newOrder, menuItems: menuItemsData });
-      }
-
-      res.statusCode = 200;
-      res.json(newOrders);
-    }
-    historyOrders();
-  } else {
     if (
       (data && data.userType === userTypes.PERSONEL) ||
       (data && data.userType === userTypes.ADMIN)
@@ -129,9 +97,44 @@ router.get('/history', (req, res) => {
         res.json(newOrders);
       }
       historyOrders();
+    } else if (data && data.userType === userTypes.USER) {
+      async function historyOrders() {
+        const orders = await Orders.findAll({
+          where: { orderUserId: data.id },
+        });
+        orders.reverse();
+        console.log(orders.length);
+        let newOrders = [];
+
+        for (let x = 0; x < orders.length; x++) {
+          console.log(orders[x].dataValues);
+          let menuItemsData = [];
+          let orderMenuItemsId =
+            orders[x].dataValues.orderMenuItemsId.split(',');
+          orderMenuItemsId = orderMenuItemsId.map((item) => parseInt(item));
+          for (let i = 0; i < orderMenuItemsId.length; i++) {
+            const data = await MenuItems.findOne({
+              where: { id: orderMenuItemsId[i] },
+            });
+
+            menuItemsData.push(data.dataValues);
+          }
+          let newOrder = orders[x].dataValues;
+
+          delete newOrder['orderMenuItemsId'];
+
+          newOrders.push({ ...newOrder, menuItems: menuItemsData });
+        }
+
+        res.statusCode = 200;
+        res.json(newOrders);
+      }
+      historyOrders();
     } else {
       res.sendStatus(403);
     }
+  } else {
+    res.sendStatus(403);
   }
 });
 
@@ -146,11 +149,10 @@ router.post('/update', (req, res) => {
         orderIsSent: req.body.orderIsSent,
         orderIsAccepted: req.body.orderIsAccepted,
       },
-      { where: { id: req.body.orderId } }
+      { where: { id: req.body.id } }
     )
-      .then((result) => {
-        res.statusCode = 201;
-        res.json(result);
+      .then(() => {
+        res.sendStatus(200);
       })
       .catch((err) => {
         res.statusCode = 500;

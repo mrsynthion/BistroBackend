@@ -122,36 +122,72 @@ router.post('/addUser', (req, res) => {
     });
 });
 
-router.post('/updateUser', (req, res) => {
+router.put('/', (req, res) => {
+  const user = req.body;
   const data = verifyAccess(req, res);
-  if (!data) {
-    res.statusCode = 401;
-    res.redirect('/');
-  }
-  if (data && data.id === req.body.id) {
-    Users.update(
-      {
-        userName: req.body.userName,
-        userLastName: req.body.userLastName,
-        userCity: req.body.userCity,
-        userAdressStreetName: req.body.userAdressStreetName,
-        userAdressStreetNumber: req.body.userAdressStreetNumber,
-        userAdressHomeNumber: req.body.userAdressHomeNumber,
-        userPhoneNumber: req.body.userPhoneNumber,
-        userPassword: req.body.userPassword,
-      },
-      { where: { id: req.body.id } }
-    )
-      .then((result) => {
-        res.statusCode = 200;
-        delete result.dataValues['userPassword'];
 
-        res.send(result.dataValues);
-      })
-      .catch((err) => {
-        res.statusCode = 500;
-        res.json({ ...err, message: 'Błąd serwera' });
-      });
+  if (data && data.id === req.body.id) {
+    console.log(data);
+    if (req.body.userPassword && req.body.userPassword.length !== 0) {
+      bcrypt
+        .hash(req.body.userPassword, saltRounds)
+        .then((hash) => {
+          Users.findOne({ where: { id: user.id } }).then((user) =>
+            user
+              .update({
+                userName: req.body.userName,
+                userLastName: req.body.userLastName,
+                userCity: req.body.userCity,
+                userAdressStreetName: req.body.userAdressStreetName,
+                userAdressStreetNumber: req.body.userAdressStreetNumber,
+                userAdressHomeNumber: req.body.userAdressHomeNumber,
+                userPhoneNumber: req.body.userPhoneNumber,
+                userPassword: hash,
+              })
+              .then((result) => {
+                res.statusCode = 200;
+                delete result.dataValues['userPassword'];
+
+                res.send(result.dataValues);
+              })
+              .catch((err) => {
+                res.statusCode = 500;
+                res.json({ ...err, message: 'Błąd serwera' });
+              })
+          );
+        })
+        .catch((e) => {
+          console.log(e);
+          res.statusCode = 500;
+          res.send('Error z hasłem');
+        });
+    } else {
+      Users.findOne({ where: { id: user.id } }).then((user) =>
+        user
+          .update(
+            {
+              userName: req.body.userName,
+              userLastName: req.body.userLastName,
+              userCity: req.body.userCity,
+              userAdressStreetName: req.body.userAdressStreetName,
+              userAdressStreetNumber: req.body.userAdressStreetNumber,
+              userAdressHomeNumber: req.body.userAdressHomeNumber,
+              userPhoneNumber: req.body.userPhoneNumber,
+            },
+            { where: { id: req.body.id } }
+          )
+          .then((result) => {
+            res.statusCode = 200;
+            delete result.dataValues['userPassword'];
+
+            res.send(result.dataValues);
+          })
+          .catch((err) => {
+            res.statusCode = 500;
+            res.json({ ...err, message: 'Błąd serwera' });
+          })
+      );
+    }
   }
 });
 
