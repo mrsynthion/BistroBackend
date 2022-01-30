@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
     });
 });
 
-router.post('/addTable', (req, res) => {
+router.post('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;

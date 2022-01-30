@@ -15,7 +15,7 @@ router.post('/addOrder', (req, res) => {
       data.userType === userTypes.PERSONEL ||
       data.userType === userTypes.ADMIN)
   ) {
-    const menuItemsId = req.body.orderMenuItems
+    const menuItemsId = req.body.menuItems
       .map((menuItem) => menuItem.id)
       .toString();
 
@@ -138,7 +138,42 @@ router.get('/history', (req, res) => {
   }
 });
 
-router.post('/update', (req, res) => {
+router.get('/:id', (req, res) => {
+  const data = verifyAccess(req, res);
+  if (
+    (data && data.userType === userTypes.PERSONEL) ||
+    (data && data.userType === userTypes.ADMIN)
+  ) {
+    const orderId = req.params.id;
+    async function getOrder() {
+      try {
+        const order = await Orders.findOne({ where: { id: orderId } });
+        let newOrder = { ...order.dataValues, menuItems: [] };
+        let orderMenuItemsId = order.dataValues.orderMenuItemsId.split(',');
+        orderMenuItemsId = orderMenuItemsId.map((item) => parseInt(item));
+        for (let i = 0; i < orderMenuItemsId.length; i++) {
+          const data = await MenuItems.findOne({
+            where: { id: orderMenuItemsId[i] },
+          });
+          newOrder = {
+            ...newOrder,
+            menuItems: [...newOrder.menuItems, data.dataValues],
+          };
+        }
+
+        delete newOrder['orderMenuItemsId'];
+        res.statusCode = 200;
+        res.json(newOrder);
+      } catch (e) {
+        console.log(e);
+        res.sendStatus(500);
+      }
+    }
+    getOrder();
+  }
+});
+
+router.put('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (
     (data && data.userType === userTypes.PERSONEL) ||
@@ -158,6 +193,8 @@ router.post('/update', (req, res) => {
         res.statusCode = 500;
         res.json(err);
       });
+  } else {
+    res.sendStatus(403);
   }
 });
 
