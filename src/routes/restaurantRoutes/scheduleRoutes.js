@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
     });
 });
 
-router.post('/addSchedule', (req, res) => {
+router.post('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;
@@ -57,7 +57,7 @@ router.post('/addSchedule', (req, res) => {
       });
   }
 });
-router.post('/updateSchedule', (req, res) => {
+router.put('/', (req, res) => {
   const data = verifyAccess(req, res);
   if (!data) {
     return;
