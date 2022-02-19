@@ -83,7 +83,7 @@ router.post('/addUser', (req, res) => {
                 })
                 .catch((err) => {
                   res.statusCode = 500;
-                  res.json({ ...err, message: 'Błąd serwera1' });
+                  res.json({ ...err, message: 'Błąd tworzenia uzytkownika' });
                 });
             } else {
               Users.create({
@@ -106,19 +106,19 @@ router.post('/addUser', (req, res) => {
                 })
                 .catch((err) => {
                   res.statusCode = 500;
-                  res.json({ ...err, message: 'Błąd serwera2' });
+                  res.json({ ...err, message: 'BBłąd tworzenia uzytkownika' });
                 });
             }
           })
           .catch((err) => {
             res.statusCode = 500;
-            res.json({ ...err, message: 'Błąd serwera3' });
+            res.json({ ...err, message: 'Błąd szyfrowania hasła' });
           });
       }
     })
     .catch((err) => {
       res.statusCode = 500;
-      res.json({ ...err, message: 'Błąd serwera' });
+      res.json({ ...err, message: 'Błąd w połączeniu z bazą danych' });
     });
 });
 
